@@ -27,7 +27,7 @@ statistics = open("stats.txt",'w')
 numOfMovies = 0
 moviesPerYear = {}
 start = time.time()
-for movie in movies[:2000]:
+for movie in movies[:10]:
     
     host = 'http://imdbapi.org/?'
     query = 'q=' + movie['name'].replace(" ","+")
@@ -35,15 +35,14 @@ for movie in movies[:2000]:
     r = requests.get(host+query+parameters)
     
     if (r.json is not None):
-        
-        # Collect statistics
-        numOfMovies += 1
-        if (movie['year'] not in moviesPerYear):
-            moviesPerYear[movie['year']] = 1
-        else:
-            moviesPerYear[movie['year']] += 1
-        
-        if type(r.json) == list:
+        if (type(r.json) == type(list)):
+            # Collect statistics
+            numOfMovies += 1
+            if (movie['year'] not in moviesPerYear):
+                moviesPerYear[movie['year']] = 1
+            else:
+                moviesPerYear[movie['year']] += 1
+                
             # Write movie data
             data = StringIO()
             json.dump(r.json[0], data)
@@ -51,7 +50,7 @@ for movie in movies[:2000]:
             file.write(",\n")
 
 end = time.time()
-print "Finished: %d" % (end-start)
+print "Finished in %d seconds" % (end-start)
 
 # Write movie statistics
 statistics.write("*** Statistics ***\n")
