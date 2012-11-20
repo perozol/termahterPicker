@@ -1,20 +1,15 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\margl1440\margr1440\vieww10800\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+TO RUN THE TESTS:
+> python tests.py
+"These tests cover the vectorization of movies, the knn core algorithm, and then finally the integration of both."
 
-\f0\fs24 \cf0 Vectorization:\
-\
-Pass an iterator of movies and vectorize actors, writers, and directors. Return a dictionary where the keys are movie IDs taken from the "imdb_id" in the JSON files. The values are dictionaries containing the actors, writers, and directors vectors.\
-\
-format:\
-\
-\{ \
-	'001': \
-		\{\
-			'actors':  \{'Christian Bale': 0.02, 'Jack Nicholson': 0.01\},\
-			'writers': \{'Christopher Nolan': 0.02\},\
-			'directors': \{'Christopher Nolan': 0.01\}\
-		\}\
-\} }
+TO RUN THE PROGRAM:
+> python rating_predictor.py classify_movies.json
+----------------------------------------------------------------------------------------------------------------------------
+CORE FILES:
+knn.py: "The core knn algorithm, takes in a trained dict of movies, and then finally classifies a movie based on this trained data"
+vectorization.py: "Takes in a json file, and formats and vectorizes it in such a way that it can be classified. Applies weights to vectors"
+tests.py: "Tests over basic functionality"
+rating_predictor: "Trains the data and executes the knn algorithm"
+----------------------------------------------------------------------------------------------------------------------------
+
+Authors: Mohamed Sleem, Luis Perozo
