@@ -4,7 +4,7 @@
 import ujson
 import fileinput
 
-def read_tweets():
+def read_movies():
     for line in fileinput.input():
         yield ujson.loads(line)
 

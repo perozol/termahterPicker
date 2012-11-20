@@ -20,7 +20,7 @@ class knn(object):
         #a and b are vectors of actors
         #do euclidian distance between each two
         if len(a)== 0 and len(b) == 0:
-            return 0
+            return 9999
         
         total = 0
         actors = []
@@ -31,6 +31,7 @@ class knn(object):
             actors.append(actor)
         
         actors = list(set(actors))
+
         for actor in actors:
             if actor in a:
                 x = a[actor]
@@ -41,51 +42,90 @@ class knn(object):
             else:
                 y = 0
             total = total + math.pow((x - y),2)
-            
-        
+
         return math.sqrt(total)
     
+    def most_common(self,lst):
+        return max(set(lst), key=lst.count)
     
-    def classify(self, training, current):
+    def train(self, training):
         #training = dictionary of all vectorized movies
+        
+        for movie in training:
+            
+            self.docs[movie] = training[movie]
+            
+            rating = self.docs[movie]['rating']
+            if rating == 10.0:
+                self.docs[movie]['class'] = 10.0
+            elif 10.0 > rating and rating >= 9.5:
+                self.docs[movie]['class'] = 9.5
+            elif 9.5 > rating and rating >= 9.0:
+                self.docs[movie]['class'] = 9.0
+            elif 9.0 > rating and rating >= 8.5:
+                self.docs[movie]['class'] = 8.5
+            elif 8.5 > rating and rating >= 8.0:
+                self.docs[movie]['class'] = 8.0
+            elif 8.0 > rating and rating >= 7.5:
+                self.docs[movie]['class'] = 7.5
+            elif 7.5 > rating and rating >= 7.0:
+                self.docs[movie]['class'] = 7.0
+            elif 7.0 > rating and rating >= 6.5:
+                self.docs[movie]['class'] = 6.5
+            elif 6.5 > rating and rating >= 6.0:
+                self.docs[movie]['class'] = 6.0
+            elif 6.0 > rating and rating >= 5.5:
+                self.docs[movie]['class'] = 5.5
+            elif 5.5 > rating and rating >= 5.0:
+                self.docs[movie]['class'] = 5.0
+            elif 5.0 > rating and rating >= 4.5:
+                self.docs[movie]['class'] = 4.5
+            elif 4.5 > rating and rating >= 4.0:
+                self.docs[movie]['class'] = 4.0
+            elif 4.0 > rating and rating >= 3.5:
+                self.docs[movie]['class'] = 3.5
+            elif 3.5 > rating and rating >= 3.0:
+                self.docs[movie]['class'] = 3.0
+            elif 3.0 > rating and rating >= 2.5:
+                self.docs[movie]['class'] = 2.5
+            elif 2.5 > rating and rating >= 2.0:
+                self.docs[movie]['class'] = 2.0
+            elif 2.0 > rating and rating >= 1.5:
+                self.docs[movie]['class'] = 1.5
+            elif 1.5 > rating and rating >= 1.0:
+                self.docs[movie]['class'] = 1.0
+            elif 1.0 > rating and rating >= 0.5:
+                self.docs[movie]['class'] = 0.5
+            else:
+                self.docs[movie]['class'] = 0.0
+    
+    def classify(self, current):
         #current is the movie we want to classify against training set
-        self.docs = training
         actorlist = current['actors']
         
         dists = {}
-        ratings = {}
+        classes = {}
+        sorted_dists = {}
         for movie in self.docs:
             templist = self.docs[movie]['actors']
-            rating = self.docs[movie]['rating']
-            self.euclid(actorlist, templist)
-            dists[movie] = self.euclid(actorlist, templist)
-            ratings[movie] = rating
+            movie_class = self.docs[movie]['class']
+            dist = self.euclid(actorlist, templist)
+            dists[movie] = dist
+            classes[movie] = movie_class
             
         sorted_dists = sorted(dists.iteritems(), key=operator.itemgetter(1))
-
+        
+        
         ids = []
         for x in range(0, self.k):
             ids.append(sorted_dists[x][0])
-            
+        """
         for id in ids:
             return ratings[id]
-        
-            
+        """
 
-def main():
-    docs = {}
-    docs['001'] = {'rating': 9.0, 'actors':{'Christian Bale': 0.87, 'Jack Nicholson': 0.76}} 
-    docs['002'] = {'rating': 8.7, 'actors':{'Dora The Explorer': 0.92, 'Jack Nicholson': 0.51}}
-    docs['003'] = {'rating': 5.5, 'actors':{'Brad Pitt': 0.92, 'Mohamed Sleem': 0.91}}
-    docs['004'] = {'rating': 8.8, 'actors':{'Bradley Cooper': 0.882, 'Dora The Explorer': 0.43}}
+        list = [classes[id] for id in ids]
+            #print list
+        common_categorie = self.most_common(list)
 
-    x = {}
-    x['actors'] = {'Christian Bale': 0.97, 'Jack Nicholson': 0.16}
-    
-    k = knn()
-    k.classify(docs, x)
-    
-if __name__=="__main__":
-    main()
-    print "done"
-    pass
+        return common_categorie

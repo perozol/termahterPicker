@@ -21,10 +21,12 @@ class vector(object):
 
         if 'actors' in movie:
             actors = movie['actors']
+            rating = movie['rating']
             
             actor_vector = dict()
             count = 0
             alpha = float(len(actors))/100.0
+            alpha = rating*alpha
             for actor in actors:
                 actor_vector[actor] = alpha*math.exp(-alpha*count)
                 count += 1
@@ -88,19 +90,25 @@ class vector(object):
                 movies - an iterator of movie dictionaries
             returns: none
         """
+        movie_vectors = dict()
         
         for movie in movies:
             movie_id = movie['imdb_id']
-
+            movie_rating = -1.0
+            if 'rating' in movie:
+                movie_rating = movie['rating']
+            
             movie_dict = dict()
+            movie_dict['title'] = movie['title']
             movie_dict['actors'] = self.vectorize_actor(movie)
             movie_dict['writers'] = self.vectorize_writer(movie)
             movie_dict['directors'] = self.vectorize_director(movie)
+            movie_dict['rating'] = movie_rating
             #movie_dict['plot'] = self.vectorize_plot(movie)
 
-            self.movie_vectors[movie_id] = movie_dict
+            movie_vectors[movie_id] = movie_dict
 
-
+        return movie_vectors
 
 
 
