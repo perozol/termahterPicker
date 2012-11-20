@@ -60,6 +60,8 @@ class knn(object):
             self.euclid(actorlist, templist)
             dists[movie] = self.euclid(actorlist, templist)
             ratings[movie] = rating
+            print dists[movie]
+            print movie
             
         sorted_dists = sorted(dists.iteritems(), key=operator.itemgetter(1))
 
@@ -80,10 +82,10 @@ def main():
     docs['004'] = {'rating': 8.8, 'actors':{'Bradley Cooper': 0.882, 'Dora The Explorer': 0.43}}
 
     x = {}
-    x['actors'] = {'Christian Bale': 0.97, 'Jack Nicholson': 0.16}
+    x['actors'] = {'Dora The Explorer': 0.97, 'Bradley Cooper': 0.16}
     
     k = knn()
-    k.classify(docs, x)
+    print k.classify(docs, x)
     
 if __name__=="__main__":
     main()
