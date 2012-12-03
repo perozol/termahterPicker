@@ -17,6 +17,11 @@ class knn(object):
         self.docs = {}
         self.k = 16
         self.distances = {}
+        self.plot_avg = {}
+        self.gen_avg = {}
+        self.wri_avg = {}
+        self.dir_avg = {}
+        self.actor_avg = {}
         
     def euclid(self, a, b):
         #a and b are vectors of actors
@@ -99,14 +104,93 @@ class knn(object):
                 self.docs[movie]['class'] = 0.5
             else:
                 self.docs[movie]['class'] = 0.0
-            
+                
+
+        actor_avg = {}      
+        for movie in training:
+            actors = training[movie]['actors']
+            for actor in actors:
+                if actor not in actor_avg:
+                    actor_avg[actor] = {}
+                    actor_avg[actor]['count'] = 1
+                    actor_avg[actor]['sum'] = actors[actor]
+                    actor_avg[actor]['avg'] = actor_avg[actor]['sum']/actor_avg[actor]['count']
+                    
+                else:
+                     actor_avg[actor]['count'] = actor_avg[actor]['count'] + 1
+                     actor_avg[actor]['sum'] = actor_avg[actor]['sum'] + actors[actor] 
+                     actor_avg[actor]['avg'] = actor_avg[actor]['sum']/actor_avg[actor]['count']
+        dir_avg = {}     
+        for movie in training:
+            actors = training[movie]['directors']
+            for actor in actors:
+                if actor not in actor_avg:
+                    dir_avg[actor] = {}
+                    dir_avg[actor]['count'] = 1
+                    dir_avg[actor]['sum'] = actors[actor]
+                    dir_avg[actor]['avg'] = dir_avg[actor]['sum']/dir_avg[actor]['count']
+                    
+                else:
+                     dir_avg[actor]['count'] = dir_avg[actor]['count'] + 1
+                     dir_avg[actor]['sum'] = dir_avg[actor]['sum'] + actors[actor] 
+                     dir_avg[actor]['avg'] = dir_avg[actor]['sum']/dir_avg[actor]['count']
+        wri_avg = {}     
+        for movie in training:
+            actors = training[movie]['writers']
+            for actor in actors:
+                if actor not in actor_avg:
+                    wri_avg[actor] = {}
+                    wri_avg[actor]['count'] = 1
+                    wri_avg[actor]['sum'] = actors[actor]
+                    wri_avg[actor]['avg'] = wri_avg[actor]['sum']/wri_avg[actor]['count']
+                    
+                else:
+                     wri_avg[actor]['count'] = wri_avg[actor]['count'] + 1
+                     wri_avg[actor]['sum'] = wri_avg[actor]['sum'] + actors[actor] 
+                     wri_avg[actor]['avg'] = wri_avg[actor]['sum']/wri_avg[actor]['count']
+                     
+        gen_avg = {}     
+        for movie in training:
+            actors = training[movie]['genres']
+            for actor in actors:
+                if actor not in actor_avg:
+                    gen_avg[actor] = {}
+                    gen_avg[actor]['count'] = 1
+                    gen_avg[actor]['sum'] = actors[actor]
+                    gen_avg[actor]['avg'] = gen_avg[actor]['sum']/gen_avg[actor]['count']
+                    
+                else:
+                     gen_avg[actor]['count'] = gen_avg[actor]['count'] + 1
+                     gen_avg[actor]['sum'] = gen_avg[actor]['sum'] + actors[actor] 
+                     gen_avg[actor]['avg'] = gen_avg[actor]['sum']/gen_avg[actor]['count']
+                     
+        plot_avg = {}     
+        for movie in training:
+            actors = training[movie]['plot']
+            for actor in actors:
+                if actor not in actor_avg:
+                    plot_avg[actor] = {}
+                    plot_avg[actor]['count'] = 1
+                    plot_avg[actor]['sum'] = plot_avg[actor]
+                    plot_avg[actor]['avg'] = plot_avg[actor]['sum']/plot_avg[actor]['count']
+                    
+                else:
+                     plot_avg[actor]['count'] = plot_avg[actor]['count'] + 1
+                     plot_avg[actor]['sum'] = plot_avg[actor]['sum'] + actors[actor] 
+                     plot_avg[actor]['avg'] = plot_avg[actor]['sum']/plot_avg[actor]['count']
+
+        self.plot_avg = plot_avg
+        self.gen_avg = gen_avg
+        self.wri_avg = wri_avg
+        self.dir_avg = dir_avg
+        self.actor_avg = actor_avg
+                
     
     def classify(self, current, vspace):
         #current is the movie we want to classify against training set
-        if vspace == 'plot':
-            actorlist = current['plot']
-        else:
-            actorlist = current[vspace]
+
+        actorlist = current[vspace]
+
         
         
         dists = {}

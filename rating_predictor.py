@@ -20,9 +20,12 @@ def main():
     # Read and vectorize movie data
     training_movies = read_training_movies()
     training_movies = vectorize.vectorize(training_movies)
+
+            
+                 
+    print actor_avg
     
     classify_movies = utils.read_movies()
-    print classify_movies
     classify_movies = vectorize.vectorize(classify_movies)
    
     
