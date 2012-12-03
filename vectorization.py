@@ -5,10 +5,36 @@ import collections
 from stemming import porter2
 from collections import Counter
 
+def tokenize(text):
+    tokens = re.findall("[\w']+", text.lower())
+    return [porter2.stem(token) for token in tokens]
+
 class vector(object):
 
     def __init__(self):
         self.movie_vectors = dict()
+
+    def vectorize_plot(self,movie):
+        """
+            purpose: read the movie and turn it into a vector of
+                plot phrases
+            parameters:
+            movies - a dictionary of a movie
+            returns: none
+        """
+ 
+        if 'plot_simple' in movie:
+            plot = tokenize(movie['plot_simple'])
+            rating = movie['rating']
+            plot_vector = dict()
+            count = 0
+            for word in plot:
+                plot_vector[word] = len(word)/rating
+                count += 1
+
+            return plot_vector
+        else:
+            return {}
 
     def vectorize_actor(self,movie):
         """
@@ -21,8 +47,8 @@ class vector(object):
 
         if 'actors' in movie:
             actors = movie['actors']
-            rating = movie['rating']
             
+            rating = movie['rating']
             actor_vector = dict()
             count = 0
             alpha = float(len(actors))/100.0
@@ -46,10 +72,11 @@ class vector(object):
  
         if 'writers' in movie:
             writers = movie['writers']
-
+            rating = movie['rating']
             writers_vector = dict()
             count = 0
             alpha = float(len(writers))/100.0
+            alpha = rating*alpha
             for writer in writers:
                 writers_vector[writer] = alpha*math.exp(-alpha*count)
                 count += 1
@@ -69,10 +96,11 @@ class vector(object):
         
         if 'directors' in movie:
             directors = movie['directors']
-            
+            rating = movie['rating']
             directors_vector = dict()
             count = 0
             alpha = float(len(directors))/100.0
+            alpha = rating*alpha
             for director in directors:
                 directors_vector[director] = alpha*math.exp(-alpha*count)
                 count += 1
@@ -80,6 +108,30 @@ class vector(object):
             return directors_vector
         else:
             return {}
+    def vectorize_genre(self,movie):
+        """
+            purpose: read the movie and turn it into a vector of
+                directors
+            parameters:
+            movie - a dictionary of a movie
+            returns: none
+        """
+        
+        if 'genre' in movie:
+            genres = movie['genre']
+            rating = movie['rating']
+            genre_vector = dict()
+            count = 0
+            alpha = float(len(genre))/100.0
+            alpha = rating*alpha
+            for genre in genres:
+                genre_vector[director] = rating
+                count += 1
+            
+            return genre_vector
+        else:
+            return {}
+
 
     def vectorize(self,movies):
 
@@ -103,7 +155,10 @@ class vector(object):
             movie_dict['actors'] = self.vectorize_actor(movie)
             movie_dict['writers'] = self.vectorize_writer(movie)
             movie_dict['directors'] = self.vectorize_director(movie)
+            movie_dict['plot'] = self.vectorize_plot(movie)
+            movie_dict['genre'] = self.vectorize_genre(movie)
             movie_dict['rating'] = movie_rating
+            
             #movie_dict['plot'] = self.vectorize_plot(movie)
 
             movie_vectors[movie_id] = movie_dict

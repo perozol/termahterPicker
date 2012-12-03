@@ -22,7 +22,7 @@ for line in f:
     movies.append(movie)
 f.close()
 
-file = open("movie_corpus9.json",'w')
+file = open("movie_corpusfinal.json",'w')
 statistics = open("stats9.txt",'w')
 
 numOfMovies = 0

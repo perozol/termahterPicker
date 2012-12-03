@@ -7,13 +7,15 @@ import math
 from stemming import porter2
 import operator
 
-
+def tokenize(text):
+    tokens = re.findall("[\w']+", text.lower())
+    return [porter2.stem(token) for token in tokens]
 
 class knn(object):
     def __init__(self):
         #self.docs is our training set
         self.docs = {}
-        self.k = 1
+        self.k = 16
         self.distances = {}
         
     def euclid(self, a, b):
@@ -54,7 +56,6 @@ class knn(object):
         for movie in training:
             
             self.docs[movie] = training[movie]
-            
             rating = self.docs[movie]['rating']
             if rating == 10.0:
                 self.docs[movie]['class'] = 10.0
@@ -98,16 +99,21 @@ class knn(object):
                 self.docs[movie]['class'] = 0.5
             else:
                 self.docs[movie]['class'] = 0.0
+            
     
-    def classify(self, current):
+    def classify(self, current, vspace):
         #current is the movie we want to classify against training set
-        actorlist = current['actors']
+        if vspace == 'plot':
+            actorlist = current['plot']
+        else:
+            actorlist = current[vspace]
+        
         
         dists = {}
         classes = {}
         sorted_dists = {}
         for movie in self.docs:
-            templist = self.docs[movie]['actors']
+            templist = self.docs[movie][vspace]
             movie_class = self.docs[movie]['class']
             dist = self.euclid(actorlist, templist)
             dists[movie] = dist
