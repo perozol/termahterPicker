@@ -12,7 +12,7 @@ def tokenize(text):
     return [porter2.stem(token) for token in tokens]
 
 class knn(object):
-    def __init__(self):
+    def __init__(self, mongo):
         #self.docs is our training set
         self.docs = {}
         self.k = 10
@@ -23,7 +23,7 @@ class knn(object):
         self.dir_avg = {}
         self.actor_avg = {}
         self.avgrating = 0
-        
+    
     def euclid(self, a, b):
         #a and b are vectors of actors
         #do euclidian distance between each two
@@ -114,6 +114,7 @@ class knn(object):
         plot_avg = {}
         rating_sum = 0
         rcount = 0
+
         for movie in training:
             actors = training[movie]['actors']
             rcount = rcount + 1
@@ -193,6 +194,7 @@ class knn(object):
         self.actor_avg = actor_avg
         self.avgrating = rating_sum/rcount
         print self.avgrating
+
     def classify(self, current, vspace):
         #current is the movie we want to classify against training set
 

@@ -19,6 +19,7 @@ def getUpcomingReleases():
         r = requests.get(host+query+parameters)
 
         if ((r.json is not None) and (type(r.json) == dict)):
+            r.json['rating'] =  5.0
             newReleases.append(r.json)
 
     return newReleases
@@ -26,5 +27,4 @@ def getUpcomingReleases():
 if __name__=="__main__":
     start = time.time()
     print getUpcomingReleases()
-    print "Finished after %d seconds" % (time.time()-start)
     pass

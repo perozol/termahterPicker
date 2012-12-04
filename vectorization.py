@@ -11,8 +11,9 @@ def tokenize(text):
 
 class vector(object):
 
-    def __init__(self):
+    def __init__(self, db):
         self.movie_vectors = dict()
+        self.db = db
 
     def vectorize_plot(self,movie):
         """
@@ -135,6 +136,8 @@ class vector(object):
             returns: none
         """
         movie_vectors = dict()
+        training = self.db['trainig']
+
         
         for movie in movies:
             movie_id = movie['imdb_id']
@@ -154,7 +157,9 @@ class vector(object):
             #movie_dict['plot'] = self.vectorize_plot(movie)
 
             movie_vectors[movie_id] = movie_dict
-
+            training.insert(movie)
+        
+        self.db['trainig'].create_index('imdb_id')
         return movie_vectors
 
 
