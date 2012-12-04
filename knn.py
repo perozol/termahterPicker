@@ -15,13 +15,14 @@ class knn(object):
     def __init__(self):
         #self.docs is our training set
         self.docs = {}
-        self.k = 16
+        self.k = 10
         self.distances = {}
         self.plot_avg = {}
         self.gen_avg = {}
         self.wri_avg = {}
         self.dir_avg = {}
         self.actor_avg = {}
+        self.avgrating = 0
         
     def euclid(self, a, b):
         #a and b are vectors of actors
@@ -111,9 +112,12 @@ class knn(object):
         wri_avg = {}
         gen_avg = {}
         plot_avg = {}
-        
+        rating_sum = 0
+        rcount = 0
         for movie in training:
             actors = training[movie]['actors']
+            rcount = rcount + 1
+            rating_sum = rating_sum + training[movie]['rating']
             for actor in actors:
                 if actor not in actor_avg:
                     actor_avg[actor] = {}
@@ -132,7 +136,9 @@ class knn(object):
                     dir_avg[director] = {}
                     dir_avg[director]['count'] = 1
                     dir_avg[director]['sum'] = directors[director]
-                    dir_avg[director]['avg'] = director[director]['sum']/dir_avg[director]['count']
+                    a = dir_avg[director]['sum']
+                    b = dir_avg[director]['count']
+                    dir_avg[director]['avg'] = a/b
                     
                 else:
                      dir_avg[director]['count'] = dir_avg[director]['count'] + 1
@@ -171,7 +177,7 @@ class knn(object):
                 if plotword not in plot_avg:
                     plot_avg[plotword] = {}
                     plot_avg[plotword]['count'] = 1
-                    plot_avg[plotword]['sum'] = plot_avg[plotword]
+                    plot_avg[plotword]['sum'] = plots[plotword]
                     plot_avg[plotword]['avg'] = plot_avg[plotword]['sum']/plot_avg[plotword]['count']
                     
                 else:
@@ -185,20 +191,22 @@ class knn(object):
         self.wri_avg = wri_avg
         self.dir_avg = dir_avg
         self.actor_avg = actor_avg
-                
-    
+        self.avgrating = rating_sum/rcount
+        print self.avgrating
     def classify(self, current, vspace):
         #current is the movie we want to classify against training set
 
         actorlist = current[vspace]
+        #print vspace
+        #print actorlist
         curdict = {}
         if vspace == "plot":
             curdict = self.plot_avg
-        else if vspace == "genre":
+        elif vspace == "genres":
             curdict = self.gen_avg
-        else if vspace == "writers":
+        elif vspace == "writers":
             curdict = self.wri_avg
-        else if vspace == "directors":
+        elif vspace == "directors":
             curdict = self.dir_avg
         else:
             curdict = self.actor_avg
@@ -207,7 +215,11 @@ class knn(object):
             if item in curdict:
                 actorlist[item] = curdict[item]['avg']
             
-            
+
+        #print 
+        #print actorlist
+        #print
+        #print "-------------------------------"
         dists = {}
         classes = {}
         sorted_dists = {}
@@ -224,10 +236,6 @@ class knn(object):
         ids = []
         for x in range(0, self.k):
             ids.append(sorted_dists[x][0])
-        """
-        for id in ids:
-            return ratings[id]
-        """
 
         list = [classes[id] for id in ids]
             #print list

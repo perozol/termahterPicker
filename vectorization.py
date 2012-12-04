@@ -51,10 +51,8 @@ class vector(object):
             rating = movie['rating']
             actor_vector = dict()
             count = 0
-            alpha = float(len(actors))/100.0
-            alpha = rating*alpha
             for actor in actors:
-                actor_vector[actor] = alpha*math.exp(-alpha*count)
+                actor_vector[actor] = rating
                 count += 1
 
             return actor_vector
@@ -75,10 +73,8 @@ class vector(object):
             rating = movie['rating']
             writers_vector = dict()
             count = 0
-            alpha = float(len(writers))/100.0
-            alpha = rating*alpha
             for writer in writers:
-                writers_vector[writer] = alpha*math.exp(-alpha*count)
+                writers_vector[writer] = rating
                 count += 1
 
             return writers_vector
@@ -99,10 +95,8 @@ class vector(object):
             rating = movie['rating']
             directors_vector = dict()
             count = 0
-            alpha = float(len(directors))/100.0
-            alpha = rating*alpha
             for director in directors:
-                directors_vector[director] = alpha*math.exp(-alpha*count)
+                directors_vector[director] = rating
                 count += 1
             
             return directors_vector
@@ -117,15 +111,13 @@ class vector(object):
             returns: none
         """
         
-        if 'genre' in movie:
-            genres = movie['genre']
+        if 'genres' in movie:
+            genres = movie['genres']
             rating = movie['rating']
             genre_vector = dict()
             count = 0
-            alpha = float(len(genre))/100.0
-            alpha = rating*alpha
             for genre in genres:
-                genre_vector[director] = rating
+                genre_vector[genre] = rating
                 count += 1
             
             return genre_vector
@@ -156,7 +148,7 @@ class vector(object):
             movie_dict['writers'] = self.vectorize_writer(movie)
             movie_dict['directors'] = self.vectorize_director(movie)
             movie_dict['plot'] = self.vectorize_plot(movie)
-            movie_dict['genre'] = self.vectorize_genre(movie)
+            movie_dict['genres'] = self.vectorize_genre(movie)
             movie_dict['rating'] = movie_rating
             
             #movie_dict['plot'] = self.vectorize_plot(movie)
