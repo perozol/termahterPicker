@@ -6,12 +6,11 @@ import re
 
 movies = []
 
-f = open('3kmovies.txt', 'r')
-
+f = open('filmsOf2012.txt')
 for line in f:
     s = line
     #list = s.split('::')
-    name = s
+    name = s[:-1]
     year = ""
     """
     for x in range(len(s)-5,len(s)-1):
@@ -22,8 +21,8 @@ for line in f:
     movies.append(movie)
 f.close()
 
-file = open("movie_corpus9.json",'w')
-statistics = open("stats9.txt",'w')
+file = open("movie_corpus12.json",'w')
+statistics = open("stats12.txt",'w')
 
 numOfMovies = 0
 moviesPerYear = {}
@@ -32,6 +31,7 @@ for movie in movies:
     
     host = 'http://imdbapi.org/?'
     query = 'q=' + movie['name'].replace(" ","+")
+    print query
     parameters = '&type=json&lang=en-US'
     r = requests.get(host+query+parameters)
 
