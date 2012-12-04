@@ -126,7 +126,7 @@ class vector(object):
             return {}
 
 
-    def vectorize(self,movies):
+    def vectorize(self,movies, collection):
 
         """
             purpose: read the movies and turn them into vectors of
@@ -135,31 +135,37 @@ class vector(object):
                 movies - an iterator of movie dictionaries
             returns: none
         """
-        movie_vectors = dict()
-        training = self.db['trainig']
-
+        movie_vectors = {}
         
         for movie in movies:
-            movie_id = movie['imdb_id']
-            movie_rating = -1.0
-            if 'rating' in movie:
-                movie_rating = movie['rating']
-            
-            movie_dict = dict()
-            movie_dict['title'] = movie['title']
-            movie_dict['actors'] = self.vectorize_actor(movie)
-            movie_dict['writers'] = self.vectorize_writer(movie)
-            movie_dict['directors'] = self.vectorize_director(movie)
-            movie_dict['plot'] = self.vectorize_plot(movie)
-            movie_dict['genres'] = self.vectorize_genre(movie)
-            movie_dict['rating'] = movie_rating
-            
-            #movie_dict['plot'] = self.vectorize_plot(movie)
+            if 'imdb_id' in movie:
+                movie_id = movie['imdb_id']
+                movie_rating = -1.0
+                if 'rating' in movie:
+                    movie_rating = movie['rating']
+                
+                movie_dict = {}
+                movie_dict['title'] = movie['title']
+                movie_dict['actors'] = self.vectorize_actor(movie)
+                movie_dict['writers'] = self.vectorize_writer(movie)
+                movie_dict['directors'] = self.vectorize_director(movie)
+                movie_dict['plot'] = self.vectorize_plot(movie)
+                movie_dict['genres'] = self.vectorize_genre(movie)
+                movie_dict['rating'] = movie_rating
+                
+                #movie_dict['plot'] = self.vectorize_plot(movie)
+                
+                movie_vectors[movie_id] = movie_dict
+                if collection == 'training':
+                    d = dict(
+                        info = movie,
+                        imdb_id = movie_id
+                    )
+                    self.db[collection].insert(d)
+    
+        if collection == 'training':
+            self.db[collection].create_index('imdb_id')
 
-            movie_vectors[movie_id] = movie_dict
-            training.insert(movie)
-        
-        self.db['trainig'].create_index('imdb_id')
         return movie_vectors
 
 

@@ -10,8 +10,8 @@ from pymongo import connection
 from settings import settings
 
 
-def read_training_movies():
-    file = open('mv.json')
+def read_movies(filename):
+    file = open(filename)
     for line in file:
         yield ujson.loads(line)
     file.close()
@@ -22,6 +22,14 @@ def connect_db(dbname, remove_existing=False):
         con.drop_database(dbname)
     return con[dbname]
 
+def copy_dict(d):
+    keys = d.keys()
+    movie = {}
+    for key in keys:
+        movie[key] = d[keys]
+
+    return movie
+
 def main():
     
     db = connect_db('termather', remove_existing=True)
@@ -30,16 +38,23 @@ def main():
     k = knn.knn(db)
     
     # Read and vectorize movie data
-    training_movies = read_training_movies()
-    training_movies = vectorize.vectorize(training_movies)
+    training_movies = read_movies('mv.json')
+    training_movies = vectorize.vectorize(training_movies, 'training')
+    print "Training with %d movies" % len(training_movies)
+    
+    upcomingReleases.getUpcomingReleases()
+    classify_movies = read_movies('newReleases.json')
+    c = {}
+    print "#################################"
+    print "Movies to classify"
+    for movie in classify_movies:
+        if 'imdb_id' in movie:
+            movie['rating'] = 5.0
+            c[movie['imdb_id']] = movie
+            print "Title: %s" % movie['title']
+    print "#################################"
+    classify_movies_vectors = vectorize.vectorize(c.itervalues(), 'classified')
 
-            
-    
-    #classify_movies = upcomingReleases.getUpcomingReleases()
-    classify_movies = utils.read_movies()
-    classify_movies_vectors = vectorize.vectorize(iter(classify_movies))
-    
-    
     # Execute classifier algorithm
     k.train(training_movies)
     errorsum = 0
@@ -55,14 +70,20 @@ def main():
         count = count+1
         avg = (actor_rating*.5) + (director_rating*.3) + (plot_rating*.1) + (genre_rating*.1)
 
-        movie['rating'] = avg
-        db['classified'].insert(movie)
+        classify_movies_vectors[movie]['rating'] = avg
+        c[movie]['rating'] = avg
+        d = dict(
+              info = c[movie],
+              imdb_id = movie
+              )
+        db['classified'].insert(d)
 
         error = math.fabs((oldrating - avg)/oldrating)
         errorsum = errorsum + error
         
+        title = classify_movies_vectors[movie]['title']
         """
-        print "Title: ",  (classify_movies[movie]['title'])
+        print "Title: %s" % title
         print "Actor rating: %f" % (actor_rating)
         print "Director rating: %f" % (director_rating)
         print "Writer rating: %f" % (writer_rating)
@@ -74,16 +95,30 @@ def main():
         print "Error: %f" %(error*100)"""
     
     db['classified'].create_index('imdb_id')
+    """
     print "*************************************"
     print "AVERAGE ERROR: %f" %(100*errorsum/count)
     print "*************************************"
+    """
 
     return db
 
 if __name__=="__main__":
     start = time.time()
-    main()
-    print db['training'].find({'imdb_id': "tt0209475"})
-    print db['classified'].find({'imdb_id': "tt0112573"})
+    db = main()
+
+    print "*************************************"
+    print "Predicted ratings"
+    print "*************************************"
+
+    results = db['classified'].find()
+    for result in results:
+        movie = result['info']
+        print "Title: %s" % movie['title']
+        print "Predicted rating: %f" % movie['rating']
+        print "Actors:"
+        print movie['actors']
+        print "\n"
+
     print "Finished after %d seconds" % (time.time()-start)
     pass

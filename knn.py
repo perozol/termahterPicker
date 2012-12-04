@@ -193,7 +193,6 @@ class knn(object):
         self.dir_avg = dir_avg
         self.actor_avg = actor_avg
         self.avgrating = rating_sum/rcount
-        print self.avgrating
 
     def classify(self, current, vspace):
         #current is the movie we want to classify against training set
