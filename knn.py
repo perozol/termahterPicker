@@ -7,14 +7,22 @@ import math
 from stemming import porter2
 import operator
 
-
+def tokenize(text):
+    tokens = re.findall("[\w']+", text.lower())
+    return [porter2.stem(token) for token in tokens]
 
 class knn(object):
     def __init__(self):
         #self.docs is our training set
         self.docs = {}
-        self.k = 1
+        self.k = 10
         self.distances = {}
+        self.plot_avg = {}
+        self.gen_avg = {}
+        self.wri_avg = {}
+        self.dir_avg = {}
+        self.actor_avg = {}
+        self.avgrating = 0
         
     def euclid(self, a, b):
         #a and b are vectors of actors
@@ -54,7 +62,6 @@ class knn(object):
         for movie in training:
             
             self.docs[movie] = training[movie]
-            
             rating = self.docs[movie]['rating']
             if rating == 10.0:
                 self.docs[movie]['class'] = 10.0
@@ -98,16 +105,126 @@ class knn(object):
                 self.docs[movie]['class'] = 0.5
             else:
                 self.docs[movie]['class'] = 0.0
-    
-    def classify(self, current):
+                
+
+        actor_avg = {}
+        dir_avg = {}
+        wri_avg = {}
+        gen_avg = {}
+        plot_avg = {}
+        rating_sum = 0
+        rcount = 0
+        for movie in training:
+            actors = training[movie]['actors']
+            rcount = rcount + 1
+            rating_sum = rating_sum + training[movie]['rating']
+            for actor in actors:
+                if actor not in actor_avg:
+                    actor_avg[actor] = {}
+                    actor_avg[actor]['count'] = 1
+                    actor_avg[actor]['sum'] = actors[actor]
+                    actor_avg[actor]['avg'] = actor_avg[actor]['sum']/actor_avg[actor]['count']
+                    
+                else:
+                     actor_avg[actor]['count'] = actor_avg[actor]['count'] + 1
+                     actor_avg[actor]['sum'] = actor_avg[actor]['sum'] + actors[actor] 
+                     actor_avg[actor]['avg'] = actor_avg[actor]['sum']/actor_avg[actor]['count']
+                     
+            directors = training[movie]['directors']
+            for director in directors:
+                if director not in dir_avg:
+                    dir_avg[director] = {}
+                    dir_avg[director]['count'] = 1
+                    dir_avg[director]['sum'] = directors[director]
+                    a = dir_avg[director]['sum']
+                    b = dir_avg[director]['count']
+                    dir_avg[director]['avg'] = a/b
+                    
+                else:
+                     dir_avg[director]['count'] = dir_avg[director]['count'] + 1
+                     dir_avg[director]['sum'] = dir_avg[director]['sum'] + directors[director] 
+                     dir_avg[director]['avg'] = dir_avg[director]['sum']/dir_avg[director]['count']
+
+            writers = training[movie]['writers']
+            for writer in writers:
+                if writer not in wri_avg:
+                    wri_avg[writer] = {}
+                    wri_avg[writer]['count'] = 1
+                    wri_avg[writer]['sum'] = writers[writer]
+                    wri_avg[writer]['avg'] = wri_avg[writer]['sum']/wri_avg[writer]['count']
+                    
+                else:
+                     wri_avg[writer]['count'] = wri_avg[writer]['count'] + 1
+                     wri_avg[writer]['sum'] = wri_avg[writer]['sum'] + writers[writer] 
+                     wri_avg[writer]['avg'] = wri_avg[writer]['sum']/wri_avg[writer]['count']
+       
+            
+            genres = training[movie]['genres']
+            for genre in genres:
+                if genre not in gen_avg:
+                    gen_avg[genre] = {}
+                    gen_avg[genre]['count'] = 1
+                    gen_avg[genre]['sum'] = genres[genre]
+                    gen_avg[genre]['avg'] = gen_avg[genre]['sum']/gen_avg[genre]['count']
+                    
+                else:
+                     gen_avg[genre]['count'] = gen_avg[genre]['count'] + 1
+                     gen_avg[genre]['sum'] = gen_avg[genre]['sum'] + genres[genre] 
+                     gen_avg[genre]['avg'] = gen_avg[genre]['sum']/gen_avg[genre]['count']
+
+            plots = training[movie]['plot']
+            for plotword in plots:
+                if plotword not in plot_avg:
+                    plot_avg[plotword] = {}
+                    plot_avg[plotword]['count'] = 1
+                    plot_avg[plotword]['sum'] = plots[plotword]
+                    plot_avg[plotword]['avg'] = plot_avg[plotword]['sum']/plot_avg[plotword]['count']
+                    
+                else:
+                     plot_avg[plotword]['count'] = plot_avg[plotword]['count'] + 1
+                     plot_avg[plotword]['sum'] = plot_avg[plotword]['sum'] + plots[plotword] 
+                     plot_avg[plotword]['avg'] = plot_avg[plotword]['sum']/plot_avg[plotword]['count']
+           
+                
+        self.plot_avg = plot_avg
+        self.gen_avg = gen_avg
+        self.wri_avg = wri_avg
+        self.dir_avg = dir_avg
+        self.actor_avg = actor_avg
+        self.avgrating = rating_sum/rcount
+        print self.avgrating
+    def classify(self, current, vspace):
         #current is the movie we want to classify against training set
-        actorlist = current['actors']
-        
+
+        actorlist = current[vspace]
+        #print vspace
+        #print actorlist
+        curdict = {}
+        if vspace == "plot":
+            curdict = self.plot_avg
+        elif vspace == "genres":
+            curdict = self.gen_avg
+        elif vspace == "writers":
+            curdict = self.wri_avg
+        elif vspace == "directors":
+            curdict = self.dir_avg
+        else:
+            curdict = self.actor_avg
+
+        for item in actorlist:
+            if item in curdict:
+                actorlist[item] = curdict[item]['avg']
+            
+
+        #print 
+        #print actorlist
+        #print
+        #print "-------------------------------"
         dists = {}
         classes = {}
         sorted_dists = {}
         for movie in self.docs:
-            templist = self.docs[movie]['actors']
+            templist = self.docs[movie][vspace]
             movie_class = self.docs[movie]['class']
             dist = self.euclid(actorlist, templist)
             dists[movie] = dist
@@ -119,10 +236,6 @@ class knn(object):
         ids = []
         for x in range(0, self.k):
             ids.append(sorted_dists[x][0])
-        """
-        for id in ids:
-            return ratings[id]
-        """
 
         list = [classes[id] for id in ids]
             #print list
