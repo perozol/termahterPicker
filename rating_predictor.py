@@ -43,15 +43,15 @@ def main():
     print "Training with %d movies" % len(training_movies)
     
     upcomingReleases.getUpcomingReleases()
-    classify_movies = read_movies('newReleases.json')
+    classify_movies = read_movies('classify_movies.json')
     c = {}
     print "#################################"
-    print "Movies to classify"
+    ##print "Movies to classify"
     for movie in classify_movies:
         if 'imdb_id' in movie:
-            movie['rating'] = 5.0
+            #movie['rating'] = 5.0
             c[movie['imdb_id']] = movie
-            print "Title: %s" % movie['title']
+            #print "Title: %s" % movie['title']
     print "#################################"
     classify_movies_vectors = vectorize.vectorize(c.itervalues(), 'classified')
 
@@ -68,7 +68,7 @@ def main():
         plot_rating = k.classify(classify_movies_vectors[movie], 'plot')
         genre_rating = k.classify(classify_movies_vectors[movie], 'genres')
         count = count+1
-        avg = (actor_rating*.5) + (director_rating*.3) + (plot_rating*.1) + (genre_rating*.1)
+        avg = (actor_rating*.14) + (director_rating*.2) + (plot_rating*.19) + (genre_rating*.28) + (writer_rating*.13)
 
         classify_movies_vectors[movie]['rating'] = avg
         c[movie]['rating'] = avg
@@ -79,10 +79,15 @@ def main():
         db['classified'].insert(d)
 
         error = math.fabs((oldrating - avg)/oldrating)
-        errorsum = errorsum + error
         
+        if error < 90:
+            errorsum = errorsum + error
         title = classify_movies_vectors[movie]['title']
-        """
+
+        
+        print count
+        
+        print
         print "Title: %s" % title
         print "Actor rating: %f" % (actor_rating)
         print "Director rating: %f" % (director_rating)
@@ -92,14 +97,14 @@ def main():
         print "----------------------"
         print "Final Rating: %f" %(avg)
         print "Actual Rating: %f" %(oldrating)
-        print "Error: %f" %(error*100)"""
+        print "Error: %f" %(error*100)
     
     db['classified'].create_index('imdb_id')
-    """
+    
     print "*************************************"
     print "AVERAGE ERROR: %f" %(100*errorsum/count)
     print "*************************************"
-    """
+
 
     return db
 
@@ -107,18 +112,18 @@ if __name__=="__main__":
     start = time.time()
     db = main()
 
-    print "*************************************"
-    print "Predicted ratings"
-    print "*************************************"
+    #print "*************************************"
+    #print "Predicted ratings"
+    #print "*************************************"
 
     results = db['classified'].find()
     for result in results:
         movie = result['info']
-        print "Title: %s" % movie['title']
-        print "Predicted rating: %f" % movie['rating']
-        print "Actors:"
-        print movie['actors']
-        print "\n"
+        #print "Title: %s" % movie['title']
+        #print "Predicted rating: %f" % movie['rating']
+        #print "Actors:"
+        #print movie['actors']
+        #print "\n"
 
     print "Finished after %d seconds" % (time.time()-start)
     pass

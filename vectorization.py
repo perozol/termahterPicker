@@ -1,7 +1,9 @@
+from __future__ import division
 import re
 import math
 import operator
 import collections
+import ujson
 from stemming import porter2
 from collections import Counter
 
@@ -9,11 +11,18 @@ def tokenize(text):
     tokens = re.findall("[\w']+", text.lower())
     return [porter2.stem(token) for token in tokens]
 
+def read_movies(filename):
+    file = open(filename)
+    for line in file:
+        yield ujson.loads(line)
+    file.close()
+
 class vector(object):
 
     def __init__(self, db):
         self.movie_vectors = dict()
         self.db = db
+        self.total = 0
 
     def vectorize_plot(self,movie):
         """
@@ -27,10 +36,11 @@ class vector(object):
         if 'plot_simple' in movie:
             plot = tokenize(movie['plot_simple'])
             rating = movie['rating']
+            ratingcount = movie['rating_count']
             plot_vector = dict()
             count = 0
             for word in plot:
-                plot_vector[word] = len(word)/rating
+                plot_vector[word] = len(word)/(((rating)*math.log(ratingcount,10))/math.log(self.total,15))
                 count += 1
 
             return plot_vector
@@ -48,12 +58,13 @@ class vector(object):
 
         if 'actors' in movie:
             actors = movie['actors']
-            
+            ratingcount = movie['rating_count']
             rating = movie['rating']
             actor_vector = dict()
             count = 0
             for actor in actors:
-                actor_vector[actor] = rating
+                alpha = math.exp(-ratingcount)
+                actor_vector[actor] = ((rating)*math.log(ratingcount,10))/math.log(self.total,15)
                 count += 1
 
             return actor_vector
@@ -72,10 +83,11 @@ class vector(object):
         if 'writers' in movie:
             writers = movie['writers']
             rating = movie['rating']
+            ratingcount = movie['rating_count']
             writers_vector = dict()
             count = 0
             for writer in writers:
-                writers_vector[writer] = rating
+                writers_vector[writer] = ((rating)*math.log(ratingcount,10))/math.log(self.total,15)
                 count += 1
 
             return writers_vector
@@ -93,11 +105,12 @@ class vector(object):
         
         if 'directors' in movie:
             directors = movie['directors']
+            ratingcount = movie['rating_count']
             rating = movie['rating']
             directors_vector = dict()
             count = 0
             for director in directors:
-                directors_vector[director] = rating
+                directors_vector[director] = ((rating)*math.log(ratingcount,10))/math.log(self.total,15)
                 count += 1
             
             return directors_vector
@@ -116,9 +129,10 @@ class vector(object):
             genres = movie['genres']
             rating = movie['rating']
             genre_vector = dict()
+            ratingcount = movie['rating_count']
             count = 0
             for genre in genres:
-                genre_vector[genre] = rating
+                genre_vector[genre] = ((rating)*math.log(ratingcount,10))/math.log(self.total,15)
                 count += 1
             
             return genre_vector
@@ -136,9 +150,19 @@ class vector(object):
             returns: none
         """
         movie_vectors = {}
+        ratingmax = 0
+
+        tempmovies = read_movies('mv.json')
         
+        for movie in tempmovies:
+            if 'rating_count' in movie:
+                if movie['rating_count'] > ratingmax:
+                    ratingmax = movie['rating_count']
+
+        self.total = ratingmax
+            
         for movie in movies:
-            if 'imdb_id' in movie:
+            if 'imdb_id' and 'rating_count' in movie:
                 movie_id = movie['imdb_id']
                 movie_rating = -1.0
                 if 'rating' in movie:
@@ -151,7 +175,15 @@ class vector(object):
                 movie_dict['directors'] = self.vectorize_director(movie)
                 movie_dict['plot'] = self.vectorize_plot(movie)
                 movie_dict['genres'] = self.vectorize_genre(movie)
-                movie_dict['rating'] = movie_rating
+                ratingcount = movie['rating_count']
+                movie_dict['rating'] = movie['rating']
+                #print 
+                #print "OLD: ", movie_rating
+                #movie_dict['rating'] = ((movie_rating)*math.log(ratingcount,10))/math.log(self.total,15)
+                #print "RATINGC", ratingcount
+                #print "NEW: " , movie_dict['rating']
+                #print
+                movie_dict['rating_count'] = movie['rating_count'] 
                 
                 #movie_dict['plot'] = self.vectorize_plot(movie)
                 

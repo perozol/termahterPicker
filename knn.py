@@ -15,7 +15,7 @@ class knn(object):
     def __init__(self, mongo):
         #self.docs is our training set
         self.docs = {}
-        self.k = 10
+        self.k = 11
         self.distances = {}
         self.plot_avg = {}
         self.gen_avg = {}
@@ -58,11 +58,12 @@ class knn(object):
     
     def train(self, training):
         #training = dictionary of all vectorized movies
-        
-        for movie in training:
-            
+
+
+        ratingmax = 0
+        for movie in training:         
             self.docs[movie] = training[movie]
-            rating = self.docs[movie]['rating']
+            rating = self.docs[movie]['rating'] 
             if rating == 10.0:
                 self.docs[movie]['class'] = 10.0
             elif 10.0 > rating and rating >= 9.5:
@@ -105,7 +106,6 @@ class knn(object):
                 self.docs[movie]['class'] = 0.5
             else:
                 self.docs[movie]['class'] = 0.0
-                
 
         actor_avg = {}
         dir_avg = {}
@@ -114,11 +114,16 @@ class knn(object):
         plot_avg = {}
         rating_sum = 0
         rcount = 0
+       
+        countsum = 0
 
+        rmax = 0
+        
         for movie in training:
             actors = training[movie]['actors']
             rcount = rcount + 1
             rating_sum = rating_sum + training[movie]['rating']
+            countsum = countsum + training[movie]['rating_count']
             for actor in actors:
                 if actor not in actor_avg:
                     actor_avg[actor] = {}
@@ -185,7 +190,10 @@ class knn(object):
                      plot_avg[plotword]['count'] = plot_avg[plotword]['count'] + 1
                      plot_avg[plotword]['sum'] = plot_avg[plotword]['sum'] + plots[plotword] 
                      plot_avg[plotword]['avg'] = plot_avg[plotword]['sum']/plot_avg[plotword]['count']
-           
+
+            if 'rating_count' in training[movie]:
+                if training[movie]['rating_count'] > rmax:
+                    rmax = training[movie]['rating_count'] 
                 
         self.plot_avg = plot_avg
         self.gen_avg = gen_avg
@@ -193,6 +201,8 @@ class knn(object):
         self.dir_avg = dir_avg
         self.actor_avg = actor_avg
         self.avgrating = rating_sum/rcount
+        self.avgcount = countsum/rcount
+        self.max = rmax
 
     def classify(self, current, vspace):
         #current is the movie we want to classify against training set
@@ -212,9 +222,19 @@ class knn(object):
         else:
             curdict = self.actor_avg
 
+        maxx = self.max
+       
+   
         for item in actorlist:
             if item in curdict:
                 actorlist[item] = curdict[item]['avg']
+            else:
+                if vspace == "plot":
+                    actorlist[item] = len(item)/((self.avgrating-3)*math.log(self.avgcount-15000,10))/math.log(maxx,15)
+                else:
+                    actorlist[item] = ((self.avgrating-3)*math.log(self.avgcount-15000,10))/math.log(maxx,15)
+
+            
             
 
         #print 
