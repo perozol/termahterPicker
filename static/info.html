@@ -1,0 +1,112 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <title>Termahter Picker</title>
+    <link href="/static/less/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/static/less/smoothness/jquery-ui-1.9.2.custom.css" type="text/css"/>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="/static/js/libs/jquery-1.8.3.js"></script>
+    <script src="/static/js/libs/jquery-ui-1.9.2.custom.js"></script>
+    
+    <script src="/static/js/libs/bootstrap/bootstrap.min.js"></script>
+    <script src="/static/js/libs/underscore-min.js"></script>
+    <script>
+        $(function() {
+          get_movie();
+          });
+    </script>
+    <style type="text/css">
+        <!--
+        A:link {text-decoration: none} A:visited {text-decoration: none}
+        A:active {text-decoration: none}
+        -->
+    </style>
+    
+    
+</head>
+    
+
+
+<body>
+<div id="wrapper">
+    <!-- the header and navigation -->
+    <div id="header">
+        <div id="tomato">
+            <div id="column-1">
+                <img src="/static/images/termather1.png" style="float: left"/>
+            </div>
+            <div id="column-2-3">
+                <div id="column-2">
+                    <a href="http://localhost:8080"><b style="font-family: 'Lucida Console'; font-size: 60px">Termather Picker</b></a>
+                </div>
+                <div id="column-3">
+                    <img src="/static/images/termather1.png" style="float: right"/>
+                </div>
+            </div>
+        </div>
+        <div id="navigation">
+            <ul>
+                <li class="nav_list"><a href="http://localhost:8080">Home</a></li>
+                <li class="nav_list"><a href="http://imdb.com">IMDb</a></li>
+                <li class="nav_list"><a href="http://rottentomatoes.com">Rotten Tomatoes</a></li>
+                <li class="nav_list"><a href="http://trailers.apple.com">iTunes Movie Trailers</a></li>
+                <li class="nav_list"><a href="http://slashfilm.com">/Slash Film</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- the content -->
+    <div id="content">
+        <div id="predictions">
+        </div>
+        <div id="moviesearch" class="span12">
+            <h2>Search Movies</h2>
+            <form class="well form-inline">
+                <input name="query" type="text" class="input-xlarge" placeholder="search">
+                <button type="submit" class="btn">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/plugins.js"></script>
+<script src="/static/js/script.js"></script>
+    
+<script id="movie_template" type="text/template">
+    <div id="movie" class="ui-widget-content ui-corner-all" onclick="submitForm()">
+        <form id="form" action="/static/info.html" method="post">
+            <div id="poster">
+                <img src="<%- poster %>" style="max-width:100px; max-height:148px" />
+            </div>
+            <div id="info">
+                <div id="movie_info">
+                    <div style="padding-top: 10px;">
+                        <a href="<%- imdb_url %>"><%- title %></a> (<%- year %>)
+                    </div>
+                    <div style="padding-top: 10px;">
+                        <t> Director: <%- directors[0] %></t>
+                    </div>
+                    <div style="padding-top: 10px;">
+                        <t> Actors: <%- actors[0] %>, <%- actors[1] %>, <%- actors[2] %></t>
+                    </div>
+                    <div style="padding-top: 10px;">
+                        <t><%- plot_simple %></t>
+                    </div>
+                </div>
+                <div id="rating">
+                    <div id="rating_img">
+                        <img src="/static/images/BlackStar.png" style="max-width: 20px; max-height: 20px"/>
+                    </div>
+                    <div id="rating_num">
+                        <h3><%- rating.toFixed(1) %></h3>
+                    </div>
+                </div>
+            </div>
+        <input name="id" type="hidden" value="<%- imdb_id %>">
+        </form>
+    </div>
+</script>
+    
+</body>
+
+
+</html>

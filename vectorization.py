@@ -160,7 +160,7 @@ class vector(object):
                     ratingmax = movie['rating_count']
 
         self.total = ratingmax
-            
+        
         for movie in movies:
             if 'imdb_id' and 'rating_count' in movie:
                 movie_id = movie['imdb_id']
