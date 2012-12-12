@@ -1,0 +1,183 @@
+body {
+    background-color: #888888;
+}
+
+#wrapper {
+    margin-right: auto;
+    margin-left: auto;
+    width: 960px;
+}
+#header {
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 940px;
+    background-color: #6CA6CD;
+}
+
+#tomato {
+    width: 940px;
+    height: 100px;
+    padding-top: 20px;
+    padding-bottom: 5px;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+#column-1 {
+    width: 58px;
+    float: left;
+    padding-left: 20px;
+}
+
+#column-2-3 {
+    width: 862px;
+    float: right;
+    position: relative;
+}
+
+#column-2 {
+    width: 784px;
+    position: absolute;
+    bottom: 0;
+    float: left;
+}
+
+#column-2 a {
+    color: #222222;
+}
+
+#column-3 {
+    width: 58px;
+    float: right;
+    padding-right: 20px;
+}
+
+#navigation {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 940px;
+    background-color: #E6E6E6;
+    color: #EAEAEA;
+}
+#navigation ul li {
+    display: inline-block;
+    width: 156px;
+    text-align: center;
+}
+
+#navigation ul li a {
+    font-family: sans-serif;
+    color: #222222;
+}
+
+#toolbar {
+    width: 940px;
+    padding-left: 220px;
+    padding-right: 220px;
+    padding-top: 11px;
+    padding-bottom: 11px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#title {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #FFFFFF;
+}
+
+#content {
+    width: 940px;
+    margin-right: 10px;
+    margin-left: 10px;
+    background-color: #FFFFFF;
+    color: #555/*{fcDefault}*/;
+    font-family: sans-serif;
+    font-weight: normal;
+    padding-bottom: 20px;
+}
+
+#predictions {
+    width: 800px;
+    padding-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#moviesearch {
+    width: 800px;
+    padding-top: 20px;
+    padding-bottom: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#movie {
+    display: block;
+    width: 750px;
+    height: 200px;
+    padding: 25px;
+    background: #E6E6E6;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+#poster {
+    float: left;
+    width: 100px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#info {
+    float: right;
+    width: 630px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#movie_info {
+    float: left;
+    width: 530px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#movie_info a {
+    #555/*{fcDefault}*/;
+}
+
+#share {
+    float: left;
+    width: 530px;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#rating {
+    float: right;
+    width: 70px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#rating_img {
+    float: left;
+    width: 30px;
+    height: 59px;
+}
+
+#rating_img img {
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 19px;
+}
+
+#rating_num {
+    float: right;
+    width: 40px;
+}
+
+

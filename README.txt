@@ -1,16 +1,28 @@
-TO RUN THE TESTS:
-> python tests.py
-"These tests cover the vectorization of movies, the knn core algorithm, and then finally the integration of both."
-
 TO RUN THE PROGRAM:
-> python rating_predictor.py classify_movies.json
+> mongod
+
+On another terminal
+> python server.py
+
 ----------------------------------------------------------------------------------------------------------------------------
 CORE FILES:
-knn.py: "The core knn algorithm, takes in a trained dict of movies, and then finally classifies a movie based on this trained data"
-vectorization.py: "Takes in a json file, and formats and vectorizes it in such a way that it can be classified. Applies weights to vectors"
-tests.py: "Tests over basic functionality"
+classifies a movie based on this trained data"
+knn.py: "The core knn algorithm, takes in a trained dict of movies, and then finally 
+moviesearch.py: "Boolean retrieval search engine"
+mv.json: "Data used to train classifier"
 rating_predictor.py: "Trains the data and executes the knn algorithm"
-utils.py: "Reads json file from command line input"
+serve.py: "Implementation of local server"
+settings.py: "Establishes ports to use for server and database"
+static: "Contains all the front end files: HTML, javascript, css, etc"
+utils.py: "Reads json files and established db connection"
+upcomingReleases.py: "Uses Rotten Tomatoes API to get movies coming out in theaters."
+vectorization.py: "Takes in a json file, and formats and vectorizes it in such a way that it can be classified. Applies weights to vectors"
+
+
+DEPENDENCIES:
+ujson
+stemming
+pymongo
 ----------------------------------------------------------------------------------------------------------------------------
 
 Authors: Mohamed Sleem, Luis Perozo

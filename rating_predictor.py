@@ -6,72 +6,95 @@ import upcomingReleases
 import utils
 import vectorization
 import math
+import operator
 from pymongo import connection
 from settings import settings
 
 class Predictor():
     
-    def __init__(self):
-        self.predictions = []
-        self.db = utils.connect_db('termather', remove_existing=True)
-
-    def copy_dict(d):
-        keys = d.keys()
-        movie = {}
-        for key in keys:
-            movie[key] = d[keys]
-
-        return movie
-
-    def main(self):
+    def __init__(self, db):
+        self.k = knn.knn()
+        self.training = db['training']
+        self.classified = db['classified']
+        self.gold = db['gold']
+        self.golden = {}
+    
+    def train_classifier(self, training_movies):
+        vectorize = vectorization.vector()
         
-        vectorize = vectorization.vector(self.db)
-        k = knn.knn(self.db)
-        
-        # Read and vectorize movie data
-        training_movies = utils.read_movies('mv.json')
-        training_movies = vectorize.vectorize(training_movies, 'training')
+        # Vectorize movie data and traing classifier
+        training_movies = vectorize.vectorize(training_movies, self.training, 'training')
+        self.training.create_index('imdb_id')
         print "Training with %d movies" % len(training_movies)
+    
+        self.k.train(training_movies)
+    
+    def golden_movie(self):
+    
+        actor_scores = sorted(self.k.actor_avg.iteritems(), key=operator.itemgetter(1))
+        actor_scores.reverse()
+        director_scores = sorted(self.k.dir_avg.iteritems(), key=operator.itemgetter(1))
+        director_scores.reverse()
+        genre_score = sorted(self.k.gen_avg.iteritems(), key=operator.itemgetter(1))
+        genre_score.reverse()
         
-        upcomingReleases.getUpcomingReleases()
-        classify_movies = utils.read_movies('newReleases.json')
-        c = {}
+        self.golden = dict(
+                           imdb_id = '0',
+                           rating = '5.5',
+                           rating_count = '100',
+                           title = 'The Greatest Movie Never Made',
+                           year = '2020',
+                           actors = [x[0] for x in actor_scores[:3]],
+                           directors = [director_scores[0][0]],
+                           genre = genre_score[0][0],
+                           poster = '/static/images/caverlee.png')
+        """
+        vectorize = vectorization.vector()
+        classify = vectorize.vectorize([self.golden],self.gold,'golden')
+    
+        actor_rating = self.k.classify(self.golden, 'actors')
+        director_rating = self.k.classify(self.golden, 'directors')
+        genre_rating = self.k.classify(self.golden, 'genres')
+    
+        avg = (actor_rating*.14) + (director_rating*.2) + (genre_rating*.28)
+        self.golden['rating'] = avg
+        """
+        return self.golden
+
+    def main(self, movies):
+        
+        vectorize = vectorization.vector()
+
+        classify_movies = {}
         print "#################################"
         print "Movies to classify"
-        for movie in classify_movies:
-            if 'imdb_id' in movie:
-                movie['rating'] = 5.0
-                movie['rating_count'] = 100
-                c[movie['imdb_id']] = movie
-                print "Title: %s" % movie['title']
+        for movie in movies:
+            classify_movies[movie['imdb_id']] = movie
+            print "Title: %s" % movie['title']
         print "#################################"
         
-        classify_movies_vectors = vectorize.vectorize(c.itervalues(), 'classified')
+        classify_movies_vectors = vectorize.vectorize(classify_movies.itervalues(), self.classified, 'classified')
 
         # Execute classifier algorithm
-        k.train(training_movies)
+
         errorsum = 0
         count = 0
 
         for movie in classify_movies_vectors:
             oldrating = classify_movies_vectors[movie]['rating']
-            classify_movies_vectors[movie]['rating'] = k.avgrating
-            actor_rating = k.classify(classify_movies_vectors[movie], 'actors')
-            director_rating = k.classify(classify_movies_vectors[movie], 'directors')
-            writer_rating = k.classify(classify_movies_vectors[movie], 'writers')
-            plot_rating = k.classify(classify_movies_vectors[movie], 'plot')
-            genre_rating = k.classify(classify_movies_vectors[movie], 'genres')
+            classify_movies_vectors[movie]['rating'] = self.k.avgrating
+            actor_rating = self.k.classify(classify_movies_vectors[movie], 'actors')
+            director_rating = self.k.classify(classify_movies_vectors[movie], 'directors')
+            writer_rating = self.k.classify(classify_movies_vectors[movie], 'writers')
+            plot_rating = self.k.classify(classify_movies_vectors[movie], 'plot')
+            genre_rating = self.k.classify(classify_movies_vectors[movie], 'genres')
             count = count+1
             avg = (actor_rating*.14) + (director_rating*.2) + (plot_rating*.19) + (genre_rating*.28) + (writer_rating*.13)
 
             classify_movies_vectors[movie]['rating'] = avg
-            c[movie]['rating'] = avg
-            d = dict(
-                  info = c[movie],
-                  imdb_id = movie
-                  )
-            self.db['classified'].insert(d)
-            self.predictions.append(d['info'])
+            classify_movies[movie]['rating'] = avg
+
+            self.classified.insert(classify_movies[movie])
 
             error = math.fabs((oldrating - avg)/oldrating)
             
@@ -95,7 +118,7 @@ class Predictor():
             print "Error: %f" %(error*100)
             """
         
-        self.db['classified'].create_index('imdb_id')
+        self.classified.create_index('imdb_id')
         
         """
         print "*************************************"

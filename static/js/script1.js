@@ -3,13 +3,11 @@
  */
 
 var movie_template = _.template($('#movie_template').html());
-var result_template = _.template($('#result_template').html());
+var result_template = _.template($('#results_template').html());
 var alert_template = _.template($('#alert_template').html());
 
 $('#moviesearch form').submit(function(ev) {
-    alert("Hello")
     var q = $(this).find('input[name=query]').val();
-    alert(q);
     ajax_search(q);
     return false;
 });
@@ -48,7 +46,7 @@ function ajax_predict() {
 }
 
 function ajax_search(q) {
-    $.ajax('/satic/search.html/search',{
+    $.ajax('/get',{
            data:{q:q},
            timeout:15000,
            success: function(data) {

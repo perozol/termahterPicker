@@ -19,9 +19,8 @@ def read_movies(filename):
 
 class vector(object):
 
-    def __init__(self, db):
+    def __init__(self):
         self.movie_vectors = dict()
-        self.db = db
         self.total = 0
 
     def vectorize_plot(self,movie):
@@ -140,7 +139,7 @@ class vector(object):
             return {}
 
 
-    def vectorize(self,movies, collection):
+    def vectorize(self,movies,collection,collection_name):
 
         """
             purpose: read the movies and turn them into vectors of
@@ -188,15 +187,12 @@ class vector(object):
                 #movie_dict['plot'] = self.vectorize_plot(movie)
                 
                 movie_vectors[movie_id] = movie_dict
-                if collection == 'training':
+                if collection_name == 'training':
                     d = dict(
                         info = movie,
                         imdb_id = movie_id
                     )
-                    self.db[collection].insert(d)
-    
-        if collection == 'training':
-            self.db[collection].create_index('imdb_id')
+                    collection.insert(d)
 
         return movie_vectors
 

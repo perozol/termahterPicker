@@ -3,13 +3,10 @@
  */
 
 var movie_template = _.template($('#movie_template').html());
-var result_template = _.template($('#result_template').html());
 var alert_template = _.template($('#alert_template').html());
 
 $('#moviesearch form').submit(function(ev) {
-    alert("Hello")
     var q = $(this).find('input[name=query]').val();
-    alert(q);
     ajax_search(q);
     return false;
 });
@@ -19,6 +16,34 @@ $('#movie').click(function(ev) {
     ajax_getMovie(id);
     return false;
 });
+
+function load() {
+    alert("Hello");
+    $.ajax('/fill',{
+           timeout:15000,
+           success: function(data) {
+           var movie_divs = _.map(data.movies, movie_template);
+           var predictions_div = $('#golden');
+           predictions_div.append(movie_divs.join(''));
+           },
+           error: function(jqXHR,textStatus,errorThrown) {
+           var error;
+           if(textStatus=='error') {
+           if(jqXHR.status==0)
+           error = "Could not connect to server. Try running ./serve.py.";
+           else
+           error = jqXHR.status+" : "+errorThrown;
+           } else {
+           error = textStatus;
+           }
+           
+           var alert = alert_template({error:error});
+           $('#golden form').after(alert);
+           $('#golden .results').hide();
+           },
+           dataType: 'json',
+           });
+}
 
 function ajax_predict() {
   $.ajax('/predict',{
@@ -48,7 +73,7 @@ function ajax_predict() {
 }
 
 function ajax_search(q) {
-    $.ajax('/satic/search.html/search',{
+    $.ajax('/get',{
            data:{q:q},
            timeout:15000,
            success: function(data) {

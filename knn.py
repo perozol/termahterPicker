@@ -12,7 +12,7 @@ def tokenize(text):
     return [porter2.stem(token) for token in tokens]
 
 class knn(object):
-    def __init__(self, mongo):
+    def __init__(self):
         #self.docs is our training set
         self.docs = {}
         self.k = 11

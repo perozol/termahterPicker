@@ -2,16 +2,19 @@
 <html class="no-js" lang="en">
 <head>
     <title>Termahter Picker</title>
-    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style2.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/static/css/smoothness/jquery-ui-1.9.2.custom.css" type="text/css"/>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script src="/static/js/libs/jquery-1.8.3.js"></script>
     <script src="/static/js/libs/jquery-ui-1.9.2.custom.js"></script>
-    
+
     <script src="/static/js/libs/bootstrap/bootstrap.min.js"></script>
     <script src="/static/js/libs/underscore-min.js"></script>
-    
     <script>
+        
+        $(function() {
+          load();
+          });
         
         $(function() {
           $( "#home" ).button()
@@ -46,6 +49,8 @@
         A:active {text-decoration: none}
         -->
     </style>
+    
+    
 </head>
     
 
@@ -77,33 +82,21 @@
                 <button id="slash">/Slash Film</button>
             </span>
         </div>
-        <div id="title" style=" text-align: center">
-            <b style="font-family: 'Lucida Console'; font-size: 30px; color: #000000;">This Week's Predictions!</b>
-        </div>
     </div>
     <!-- the content -->
     <div id="content">
-        <div id="predictions">
+        <div id="golden">
         </div>
-        <!--
-        <div id="moviesearch" class="span12">
-            <h2>Search Movies</h2>
-            <form class="well form-inline">
-                <input name="query" type="text" class="input-xlarge" placeholder="search">
-                <button type="submit" class="btn">Search Movie Title</button>
-            </form>
-        </div>
-        -->
     </div>
 </div>
     
 <script id="alert_template" type="text/template">
     <div class="alert">
-        <button class="close" data-dismiss="alert">×</button>
-        <strong>Error!</strong><p><%- error %></p>
+    <button class="close" data-dismiss="alert">×</button>
+    <strong>Error!</strong><p><%- error %></p>
     </div>
-</script>
-    
+    </script>
+
 <script id="movie_template" type="text/template">
     <div id="movie" class="ui-widget-content ui-corner-all">
         <form id="form" action="/static/info.html" method="post">
@@ -113,7 +106,7 @@
             <div id="info">
                 <div id="movie_info">
                     <div style="padding-top: 10px;">
-                        <a href="<%- imdb_url %>"><%- title %></a> (<%- year %>)
+                        <%- title %></a> (<%- year %>)
                     </div>
                     <div style="padding-top: 10px;">
                         <t> Director: <%- directors[0] %></t>
@@ -121,48 +114,15 @@
                     <div style="padding-top: 10px;">
                         <t> Actors: <%- actors[0] %>, <%- actors[1] %>, <%- actors[2] %></t>
                     </div>
-                    <div style="padding-top: 10px;">
-                        <t><%- plot_simple %></t>
-                    </div>
-                    <div id="share">
-                        <div id="twitter">
-                            <a href="https://twitter.com/share" class="twitter-share-button" data-lang="en" data-text="Check out this rating prediction for <%- title %>! #termatherPicker http://localhost:8080/">Tweet</a>
-                        </div>
-                        <div id="fb">
-                        </div>
-                    </div>
-                </div>
-                <div id="rating">
-                    <div id="rating_img">
-                        <img src="/static/images/BlackStar.png" style="max-width: 20px; max-height: 20px"/>
-                    </div>
-                    <div id="rating_num">
-                        <h3><%- rating.toFixed(1) %></h3>
-                    </div>
                 </div>
             </div>
-            <input name="id" type="hidden" value="<%- imdb_id %>">
+        <input name="id" type="hidden" value="<%- imdb_id %>">
         </form>
     </div>
 </script>
 
-<script id="result_template" type="text/template">
-    <p class="result_message">
-    Found <%- count %> tweets in <%- time.toFixed(3) %> seconds.
-    </p>
-</script>
-
 <script src="/static/js/plugins.js"></script>
-<script src="/static/js/script.js"></script>
-    
-<script>
-    $(function() {
-      ajax_predict();
-      });
-    
-    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-</script>
-    
+<script src="/static/js/script2.js"></script>
 </body>
 
 
